@@ -9,7 +9,7 @@ $quote = new Quote($db);
 $data = json_decode(file_get_contents("php://input"));
 
 //Check for required data
-if (!empty($data->quote)) {
+if (isset($data->quote)) {
   $quote->quote = $data->quote;
 
   //Create quote with id

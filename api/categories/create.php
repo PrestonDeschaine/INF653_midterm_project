@@ -9,7 +9,7 @@ $category = new Category($db);
 $data = json_decode(file_get_contents("php://input"));
 
 //Check for required data
-if (!empty($data->category)) {
+if (isset($data->category)) {
   $category->category = $data->category;
 
   //Create category with id
