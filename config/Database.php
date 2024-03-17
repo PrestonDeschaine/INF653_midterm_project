@@ -13,7 +13,7 @@ class Database {
     $this->password = getenv('PASSWORD');
     $this->db_name = getenv('DBNAME');
     $this->host = getenv('HOST');
-    $this->port = getenv('DBPORT');
+    $this->port = getenv('PORT');
   }
 
   public function connect() {
