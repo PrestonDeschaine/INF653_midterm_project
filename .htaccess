@@ -1,0 +1,5 @@
+SetEnv USERNAME "preston"
+SetEnv PASSWORD "vkWeJbZWQAXH10FPkxvpzoxiTIC8nbCj"
+SetEnv DBNAME "quotesdb"
+SetEnv HOST "localhost"
+SetEnv PORT "5432"

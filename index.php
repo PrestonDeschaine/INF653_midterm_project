@@ -1,9 +1,9 @@
-<? php
+<?php
 
 declare(strict_types=1);
 
-echo '<pres>';
-print_r(get_env('SITE_URL'));
+echo '<pre>';
+print_r(getenv('SITE_URL'));
 echo '<br>';
 print_r($_SERVER);
 echo '</pre>';
