@@ -9,7 +9,7 @@ $author = new Author($db);
 $data = json_decode(file_get_contents("php://input"));
 
 //Check for required data
-if (!empty($data->author)) {
+if (isset($data->author)) {
   $author->author = $data->author;
 
   //Create author with id
