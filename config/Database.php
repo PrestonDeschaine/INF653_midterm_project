@@ -1,11 +1,11 @@
 <?php
 class Database {
   private $conn;
-  private $host = 'localhost';
+  private $host;
   private $port;
-  private $db_name = 'midterm';
-  private $username = 'root';
-  private $password = '123456';
+  private $db_name;
+  private $username;
+  private $password;
   
   public function __construct() {
     // Initialize connection parameters from environment variables
