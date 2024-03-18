@@ -14,7 +14,7 @@ class Author{
 
   // Creates a new author
   public function create(){
-    $query = 'INSERT INTO ' . $this->table . ' SET author = :author';
+    $query = 'INSERT INTO ' . $this->table . ' (author) VALUES (:author) RETURNING id, author';
 
     $stmt = $this->conn->prepare($query);
 
@@ -38,12 +38,10 @@ class Author{
     $stmt = $this->conn->prepare($query);
 
     if($stmt->execute()){
-      return true;
+      return $stmt;
     }
 
     echo "Error: $stmt->error.\n";
-
-    return false;
   }
 
   // Gets authors
