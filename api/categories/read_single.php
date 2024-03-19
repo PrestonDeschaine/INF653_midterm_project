@@ -1,33 +1,31 @@
 <?php
-// Include necessary files
-include_once '../../config/Database.php'; // Include the file containing the Database class definition
-include_once '../../models/Category.php'; // Include the file containing the Category class definition
+include_once '../../config/Database.php'; // Including the database configuration file
+include_once '../../models/Category.php'; // Including the Category model file
 
-// Instantiate Database object and connect to the database
-$database = new Database();    // Database class is responsible for establishing a database connection
-$db = $database->connect();    // Connect to the database
+// Instantiate DB & connect
+$database = new Database();
+$db = $database->connect(); // Creating a database connection
 
-// Instantiate Category object
-$category = new Category($db); // Category class represents a category entity in the database
+// Instantiate category object
+$category = new Category($db); // Creating an instance of the Category class and passing the database connection
 
-// Get the ID from the query parameters
-$category->id = isset($_GET['id']) ? $_GET['id'] : die(); // Get the ID of the category from the request URL
+// GET ID
+$category->id = isset($_GET['id']) ? $_GET['id'] : die(); // Get the category ID from the request parameter or terminate the script if not provided
 
-// Retrieve the category data using the provided ID
-$category->read_single(); // Retrieve a single category's data from the database
+// Get category
+$category->read_single(); // Retrieve details of a single category based on the provided ID
 
-// Create an array to hold category data
-if(isset($category->id) && isset($category->category)){
-    // If category ID and name are set, create an array with category information
+// Create array
+if((isset($category->id) && isset($category->category))){
+    // If category ID and name are set, create an array containing category details
     $category_arr = array(
-        'id'       => $category->id,       // ID of the category
-        'category' => $category->category, // Name of the category
+        'id'            => $category->id,
+        'category'      => $category->category,
     );
 
-    // Convert category array to JSON format and print
-    print_r(json_encode($category_arr)); // Print the category information in JSON format
+    // Convert the category details array to JSON format and output it
+    print_r(json_encode($category_arr));
 } else {
     // If category ID or name is not found, print an error message
-    print_r(json_encode(array("message" => "category_id Not Found"))); // Print a JSON-encoded error message
+    print_r(json_encode(array("message" => "category_id Not Found")));
 }
-?>

@@ -1,49 +1,46 @@
 <?php
-// Include necessary files
-include_once '../../config/Database.php'; // Include the file containing the Database class definition
-include_once '../../models/Category.php'; // Include the file containing the Category class definition
+// Headers
+include_once '../../config/Database.php'; // Including the database configuration file
+include_once '../../models/Category.php'; // Including the Category model file
 
-// Instantiate Database object and connect to the database
-$database = new Database();    // Database class is responsible for establishing a database connection
-$db = $database->connect();    // Connect to the database
+// Instantiate DB & connect
+$database = new Database();
+$db = $database->connect(); // Creating a database connection
 
-// Instantiate Category object
-$category = new Category($db); // Category class represents a category entity in the database
+// Instantiate category object
+$category = new Category($db); // Creating an instance of the Category class and passing the database connection
 
-// Query to fetch all categories
-$result = $category->read(); // Call the read method of the Category object to retrieve all categories from the database
+// Quotes acategory query
+$result = $category->read(); // Executing the read method to retrieve categories from the database
+// Get row count
+$num = $result->rowCount(); // Getting the number of rows returned from the query
 
-// Get the number of categories returned
-$num = $result->rowCount(); // Get the number of rows returned by the query
-
-// Check if there are categories found
+// Check if any categories
 if($num > 0){
-    // If categories are found, initialize an empty array to hold category data
-    $categories_arr = array();
+    // Category array
+    $categories_arr = array(); // Initializing an array to store category data
 
-    // Loop through each row returned by the query
+    // Loop through retrieved data
     while($row = $result->fetch(PDO::FETCH_ASSOC)){
-        // Extract the values from the row
-        extract($row);
+        extract($row); // Extracting variables from the row
 
-        // Create an array representing a category
+        // Creating an array for each category
         $category_item = array(
-            'id'       => $id,       // ID of the category
-            'category' => $category  // Name of the category
+            'id'            => $id,
+            'category'      => $category
         );
 
-        // Add the category data to the array of categories
+        // Pushing the category data to the categories array
         array_push($categories_arr, $category_item);
     }
 
-    // Convert the array of categories to JSON format and echo it
-    echo json_encode($categories_arr); // Print the array of categories in JSON format
+    // Convert the categories array to JSON format and output it
+    echo json_encode($categories_arr);
 } else {
-    // If no categories are found, print an error message
+    // If no categories found, print a message
     echo json_encode(
         array(
             'message' => 'No Categories Found'
         )
     );
 }
-?>

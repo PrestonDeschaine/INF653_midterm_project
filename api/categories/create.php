@@ -1,41 +1,39 @@
 <?php
-// Include necessary files
-include_once '../../config/Database.php'; // Include the file containing the Database class definition
-include_once '../../models/Category.php'; // Include the file containing the Category class definition
+// Headers
 
-// Instantiate Database object and connect to the database
-$database = new Database();    // Database class is responsible for establishing a database connection
-$db = $database->connect();    // Connect to the database
+include_once '../../config/Database.php'; // Including the database configuration file
+include_once '../../models/Category.php'; // Including the Category model file
 
-// Instantiate Category object
-$category = new Category($db); // Category class represents a category entity in the database
+// Instantiate DB & connect
+$database = new Database();
+$db = $database->connect(); // Creating a database connection
 
-// Retrieve data from the request body and decode it
-$data = json_decode(file_get_contents("php://input")); // Decode JSON data sent in the request body
+// Instantiate category object
+$category = new Category($db); // Creating an instance of the Category class and passing the database connection
 
-// Set the category property of the Category object if it exists in the decoded data
-$category->category = isset($data->category) ? $data->category : null; // Set the category name
+// Get raw posted data
+$data = json_decode(file_get_contents("php://input")); // Retrieving JSON data from the request body and decoding it
 
-// Check if category name is set
+// Set category name
+$category->category = isset($data->category) ? $data->category : null; // Setting the category name from the posted data
+
 if(isset($category->category)){
-    // If category name is set, attempt to create the category
-    $category_id = $category->create(); // Call the create method of the Category object to create the category
+    // Create category
+    $category_id = $category->create(); // Creating a new category in the database
 
-    // Check if category creation was successful
     if($category_id){
-        // If category is successfully created, create an array with category information
+        // Create array containing category details
         $category_arr = array(
-            'id'       => $category_id,          // ID of the created category
-            'category' => $category->category,   // Name of the created category
+            'id'              => $category_id,
+            'category'        => $category->category,
         );
 
-        // Convert the array to JSON format and print
-        print_r(json_encode($category_arr)); // Print the created category information in JSON format
+        // Convert the category details array to JSON format and output it
+        print_r(json_encode($category_arr));
     }
 } else {
-    // If category name is missing, print an error message
+    // If required parameters are missing, return an error message
     echo json_encode(
         array('message' => 'Missing Required Parameters')
     ); 
 }
-?>

@@ -1,33 +1,32 @@
 <?php
-// Include necessary files
-include_once '../../config/Database.php'; // Include the file containing the Database class definition
-include_once '../../models/Author.php';   // Include the file containing the Author class definition
+// Including necessary files
+include_once '../../config/Database.php'; // Including the database configuration file
+include_once '../../models/Author.php'; // Including the Author model file
 
-// Instantiate Database object and connect to the database
-$database = new Database();    // Database class is responsible for establishing a database connection
-$db = $database->connect();    // Connect to the database
+// Instantiate DB & connect
+$database = new Database();
+$db = $database->connect();
 
-// Instantiate Author object
-$author = new Author($db); // Author class represents an author entity in the database
+// Instantiate authors object
+$author = new Author($db);
 
-// Get the ID from the query parameters
-$author->id = isset($_GET['id']) ? $_GET['id'] : die(); // Get the ID of the author from the request URL
+// GET ID
+$author->id = isset($_GET['id']) ? $_GET['id'] : die(); // Get the author ID from the request parameter or terminate the script if not provided
 
-// Retrieve the author data using the provided ID
-$author->read_single(); // Retrieve a single author's data from the database
+//Get post
+$author->read_single(); // Retrieve details of a single author based on the provided ID
 
-// Create an array to hold author data
-if(isset($author->id) && isset($author->author)){
-    // If author ID and name are set, create an array with author information
+//Create array
+if((isset($author->id) && isset($author->author))){
+    // If author ID and name are set, create an array containing author details
     $author_arr = array(
-        'id'     => $author->id,
-        'author' => $author->author,
+        'id'            => $author->id,
+        'author'        => $author->author,
     );
 
-    // Convert author array to JSON format and print
-    print_r(json_encode($author_arr)); // Print the author information in JSON format
+    // Make JSON
+    print_r(json_encode($author_arr)); // Encode the author details array into JSON format and print it
 } else {
     // If author ID or name is not found, print an error message
-    print_r(json_encode(array("message" => "author_id Not Found"))); // Print a JSON-encoded error message
+    print_r(json_encode(array("message" => "author_id Not Found")));
 }
-?>

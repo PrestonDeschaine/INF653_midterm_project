@@ -1,44 +1,42 @@
 <?php
-// Include necessary files
-include_once '../../config/Database.php'; // Include the file containing the Database class definition
-include_once '../../models/Category.php'; // Include the file containing the Category class definition
+include_once '../../config/Database.php'; // Including the database configuration file
+include_once '../../models/Category.php'; // Including the Category model file
 
-// Instantiate Database object and connect to the database
-$database = new Database();    // Database class is responsible for establishing a database connection
-$db = $database->connect();    // Connect to the database
+// Instantiate DB & connect
+$database = new Database();
+$db = $database->connect(); // Creating a database connection
 
-// Instantiate Category object
-$category = new Category($db); // Category class represents a category entity in the database
+// Instantiate category object
+$category = new Category($db); // Creating an instance of the Category class and passing the database connection
 
-// Retrieve raw posted data from the request body and decode it
-$data = json_decode(file_get_contents("php://input")); // Decode JSON data sent in the request body
+// Get raw posted data
+$data = json_decode(file_get_contents("php://input")); // Retrieving JSON data from the request body and decoding it
 
-// Set the ID and category properties of the Category object if they exist in the decoded data
-$category->id = isset($data->id) ? $data->id : null; // Set the ID of the category to be updated
-$category->category = isset($data->category) ? $data->category : null; // Set the name of the category
+// Set ID and category to update
+$category->id = isset($data->id) ? $data->id : null; // Setting the category ID to update
+$category->category = isset($data->category) ? $data->category : null; // Setting the category name to update
 
-// Check if both category ID and name are set
+// Update category
 if(isset($category->category) && isset($category->id)){
-    // If both parameters are set, attempt to update the category
-    if($category->update()){ // Call the update method of the Category object
-        // If the update is successful, create an array with updated category information
+    // Check if category name and ID are set
+    if($category->update()){
+        // If category update is successful, create an array containing updated category details
         $category_arr = array(
-            'id'       => $category->id,       // ID of the updated category
-            'category' => $category->category, // Name of the updated category
+            'id'            => $category->id,
+            'category'      => $category->category,
         );
 
-        // Convert the array to JSON format and print
-        print_r(json_encode($category_arr)); // Print the updated category information in JSON format
+        // Convert the category details array to JSON format and output it
+        print_r(json_encode($category_arr));
     } else {
-        // If the update fails, print an error message
+        // If category update fails, return an error message
         echo json_encode(
             array('message' => 'Category Not Updated')
         );  
     }
 } else {
-    // If either category ID or name is missing, print an error message
+    // If required parameters are missing, return an error message
     echo json_encode(
         array('message' => 'Missing Required Parameters')
     );  
 }
-?>

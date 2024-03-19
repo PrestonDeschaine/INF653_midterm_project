@@ -1,41 +1,41 @@
 <?php
-//Headers
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-header('Access-Control-Allow-Methods: DELETE');
-header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization.X-Requested-With');
+// Including necessary files
+include_once '../../config/Database.php'; // Including the database configuration file
+include_once '../../models/Quote.php'; // Including the Quote model file
 
-include_once '../../config/Database.php';
-include_once '../../models/Quote.php';
-
-
-//Instantiate DB and CONNECT
+// Creating a database connection
 $database = new Database();
-$db = $database->connect();
+$db = $database->connect(); // Establishing a connection to the database
 
+// Creating an instance of the Quote class and providing the database connection
+$quote = new Quote($db);
 
-//Instantiate blog quote object
-$quo = new Quote($db);
-
-//Get the raw posted data
+// Retrieving raw posted data and decoding JSON
 $data = json_decode(file_get_contents("php://input"));
 
-//data is not set
-if(!isset($data->id)){
-    echo(json_encode(array('message' => 'Missing Required parameters')));
-    exit();
-}
+// Setting the ID of the quote to be deleted
+$quote->id = isset($data->id) ? $data->id : null;
 
-//SET ID TO UPDATE
-$quo->id = $data->id;
+// Deleting the quote if ID is set
+if(isset($quote->id)){
+    if($quote->delete()){
+        // If quote deletion is successful, create an array containing the deleted quote's ID
+        $quote_arr = array(
+            'id'            => $quote->id,
+        );
 
-//delete post
-if($quo->delete()){
-    echo json_encode(
-        array('id' => $quo->id)
-    );
+        // Convert the quote details array to JSON format and output it
+        print_r(json_encode($quote_arr));
+    } else {
+        // If no quotes found for deletion, return an appropriate message
+        echo json_encode(
+            array('message' => 'No Quotes Found')
+        );  
+    }
 } else {
+    // If no ID is provided, return an appropriate message
     echo json_encode(
         array('message' => 'No Quotes Found')
-    );
+    ); 
 }
+?>
