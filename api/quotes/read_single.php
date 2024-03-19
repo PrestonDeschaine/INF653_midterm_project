@@ -1,60 +1,38 @@
-<?php 
-$quote = new Quote($db);
+<?php
+// Set content type header to JSON
+header('Content-Type: application/json');
 
-if (isset($_GET['id'])) {
-  $quote->id = $_GET['id'];
-} else if (isset($_GET['authorId'], $_GET['categoryId'])) {
-  $quote->author_id = $_GET['authorId'];
-  $quote->category_id =  $_GET['categoryId'];
-} else if (isset($_GET['authorId'])) {
-  $quote->author_id = $_GET['authorId'];
-} else if (isset($_GET['categoryId'])) {
-  $quote->category_id = $_GET['categoryId'];   
-} else {
-  die();
-}
+// Include necessary files
+include_once '../../config/Database.php'; // Include the file containing the Database class definition
+include_once '../../models/Quote.php';    // Include the file containing the Quote class definition
 
-$result = $quote->read_single();
+// Instantiate Database object and connect to the database
+$database = new Database();    // Database class is responsible for establishing a database connection
+$db = $database->connect();    // Connect to the database
 
-$entries = $result->rowCount();
+// Instantiate Quote object
+$quote = new Quote($db); // Quote class represents a quote entity in the database
 
-if ($entries === 1) {
-  while($entries = $result->fetch(PDO::FETCH_ASSOC)) {
-    extract($entries);
-    
-    $quote = array(
-        'id' => $id,
-        'quote' => html_entity_decode($quote),
-        'author' => $author,
-        'category' => $category
-    );
-  }
-  echo json_encode($quote); 
-}
+// Get the ID from the query parameters
+$quote->id = isset($_GET['id']) ? $_GET['id'] : die(); // Get the ID of the quote from the request URL
 
-else if ($entries > 0) {
-  
-  $quotes = array();
+// Retrieve data for a single quote based on the provided ID
+$quote->read_single(); // Retrieve a single quote's data from the database
 
-  while($entries = $result->fetch(PDO::FETCH_ASSOC)) {
-    extract($entries);
-    
-    $quote_item = array(
-        'id' => $id,
-        'quote' => html_entity_decode($quote),
-        'author' => $author,
-        'category' => $category
+// Check if quote was found
+if ($quote->id != null && $quote->quote != null) {
+    // If quote is found, create an array with quote information
+    $quote_arr = array(
+        'id'       => $quote->id,       // ID of the quote
+        'quote'    => $quote->quote,    // Quote text
+        'author'   => $quote->author,   // Author of the quote
+        'category' => $quote->category, // Category of the quote
     );
 
-    array_push($quotes, $quote_item);
-  }
-
-  echo json_encode($quotes);
-  'message' => 'Quotes Found';
-  
+    // Return JSON data for the quote
+    echo json_encode($quote_arr); // Print the quote information in JSON format
 } else {
-  echo json_encode(
-  array(
-    'message' => 'No Quotes Found'
-  ));
+    // If quote is not found, return a message indicating no quotes were found
+    echo json_encode(array('message' => 'No Quotes Found')); // Print a JSON-encoded error message
 }
+?>

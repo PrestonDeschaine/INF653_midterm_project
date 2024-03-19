@@ -1,30 +1,41 @@
 <?php
-// This PHP script handles the creation of a new author.
-// It receives JSON data containing the author and stores it in the database.
-// It returns a JSON response with the new author's ID and a message.
+// Include necessary files
+include_once '../../config/Database.php';
+include_once '../../models/Author.php';
 
+// Create a new instance of the Database class
+$database = new Database();
+// Connect to the database
+$db = $database->connect();
+
+// Create a new instance of the Author class
 $author = new Author($db);
 
-// get posted data
+// Retrieve data from the request body and decode it
 $data = json_decode(file_get_contents("php://input"));
 
-//Check for required data
-if (isset($data->author)) {
-  $author->author = $data->author;
+// Set the author property of the Author object if it exists in the decoded data
+$author->author = isset($data->author) ? $data->author : null;
 
-  //Create author with id
-  if ($author->create()) {
+// Check if author data is set
+if(isset($author->author)){
+    // Call the create method of the Author object to insert the author into the database
+    $author_id = $author->create();
+    // Check if author creation was successful and author data is set
+    if($author_id && $author->author){
+        // Create an array containing author information
+        $author_arr = array(
+            'id'            => $author_id,
+            'author'        => $author->author,
+        );
+
+        // Print the author information in JSON format
+        print_r(json_encode($author_arr));
+    }
+} else {
+    // If author data is missing, return an error message
     echo json_encode(
-      array(
-        'id' => $author->id,
-        'author' => $author->author,
-        'message' => 'Author Created'
-      )
-    );
-  } else {
-    echo json_encode(
-      array('message' => 'Author Not Created')
-    );
-  }
+        array('message' => 'Missing Required Parameters')
+    );  
 }
 ?>

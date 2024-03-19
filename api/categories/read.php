@@ -1,28 +1,49 @@
 <?php
-$category = new Category($db);
+// Include necessary files
+include_once '../../config/Database.php'; // Include the file containing the Database class definition
+include_once '../../models/Category.php'; // Include the file containing the Category class definition
 
-$result = $category->read();
+// Instantiate Database object and connect to the database
+$database = new Database();    // Database class is responsible for establishing a database connection
+$db = $database->connect();    // Connect to the database
 
-$entries = $result->rowCount();
+// Instantiate Category object
+$category = new Category($db); // Category class represents a category entity in the database
 
-if ($entries > 0) {
-  
-  $categories = array();
+// Query to fetch all categories
+$result = $category->read(); // Call the read method of the Category object to retrieve all categories from the database
 
-  while($entries = $result->fetch(PDO::FETCH_ASSOC)) {
-    extract($entries);
+// Get the number of categories returned
+$num = $result->rowCount(); // Get the number of rows returned by the query
 
-    $category_item = array(
-        'id' => $id,
-        'category' => $category
-    );
+// Check if there are categories found
+if($num > 0){
+    // If categories are found, initialize an empty array to hold category data
+    $categories_arr = array();
 
-    array_push($categories, $category_item);
-  }
+    // Loop through each row returned by the query
+    while($row = $result->fetch(PDO::FETCH_ASSOC)){
+        // Extract the values from the row
+        extract($row);
 
-  echo json_encode($categories);
-  echo json_encode(array('message' => 'Categories Found'));
-  
+        // Create an array representing a category
+        $category_item = array(
+            'id'       => $id,       // ID of the category
+            'category' => $category  // Name of the category
+        );
+
+        // Add the category data to the array of categories
+        array_push($categories_arr, $category_item);
+    }
+
+    // Convert the array of categories to JSON format and echo it
+    echo json_encode($categories_arr); // Print the array of categories in JSON format
 } else {
-  echo json_encode(array('message' => 'No Categories Found'));
+    // If no categories are found, print an error message
+    echo json_encode(
+        array(
+            'message' => 'No Categories Found'
+        )
+    );
 }
+?>
